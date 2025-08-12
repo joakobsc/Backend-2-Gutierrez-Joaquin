@@ -1,0 +1,82 @@
+[
+  {
+    "id": 2,
+    "title": "Ford F-150",
+    "description": "Pickup robusta con gran capacidad de carga y remolque, diseñada para tareas exigentes y aventuras al aire libre.",
+    "code": "FOF15001",
+    "price": 40000,
+    "stock": 10,
+    "category": "Pick up",
+    "status": true
+  },
+  {
+    "id": 3,
+    "title": "Honda CR-V",
+    "description": "SUV compacta con tecnología avanzada y confort, destacando por su eficiencia de combustible y capacidad de carga.",
+    "code": "HCRV01",
+    "price": 32000,
+    "stock": 12,
+    "category": "SUV",
+    "status": true
+  },
+  {
+    "id": 4,
+    "title": "Toyota RAV4",
+    "description": "SUV versátil con un diseño elegante y amplio espacio interior, ideal para aventuras en carretera y uso diario.",
+    "code": "TRAV402",
+    "price": 300000,
+    "stock": 15,
+    "category": "SUV",
+    "status": true
+  },
+  {
+    "id": 5,
+    "title": "Toyota Corolla",
+    "description": "Auto confiable y económico con un diseño elegante, ideal para quienes buscan durabilidad y ahorro de combustible.",
+    "code": "TCOR231",
+    "price": 23000,
+    "stock": 15,
+    "category": "Auto",
+    "status": true
+  },
+  {
+    "id": 6,
+    "title": "Honda Civic",
+    "description": "Sedán compacto con un diseño deportivo y eficiente, ofreciendo un equilibrio entre rendimiento y comodidad.",
+    "code": "HCIV220",
+    "price": 22000,
+    "stock": 20,
+    "category": "Auto",
+    "status": true
+  },
+  {
+    "id": 7,
+    "title": "Tesla Model 3",
+    "description": "Auto eléctrico de lujo con alto rendimiento y tecnología innovadora, destacando por su autonomía y diseño minimalista.",
+    "code": "T3MODEL45",
+    "price": 45000,
+    "stock": 6,
+    "category": "Auto",
+    "status": true
+  },
+  {
+    "id": 8,
+    "title": "Chevrolet Silverado",
+    "description": "Pickup poderosa con un diseño fuerte y un interior cómodo, perfecta para trabajo y actividades recreativas.",
+    "code": "CSILV420",
+    "price": 42000,
+    "stock": 10,
+    "category": "Pick up",
+    "status": true
+  },
+  {
+    "id": 9,
+    "title": "Ford Escape",
+    "description": "SUV dinámica con un manejo ágil y una cabina moderna, perfecta para familias y escapadas urbanas.",
+    "code": "FESC280",
+    "price": 28000,
+    "stock": 12,
+    "category": "SUV",
+    "status": true
+  }
+]

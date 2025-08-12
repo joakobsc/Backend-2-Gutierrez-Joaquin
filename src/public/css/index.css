@@ -1,0 +1,62 @@
+body {
+  background-image: url(../assets/car.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-weight: bolder;
+}
+
+button {
+  background-color: rgba(21, 21, 21, 0.774);
+  text-decoration: none;
+  border: solid white 2px;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin: 0.5em;
+  color: #ffffffe1;
+  font-weight: bold;
+}
+
+input {
+  background-color: rgba(21, 21, 21, 0.788);
+  text-decoration: none;
+  border: solid rgb(184, 184, 184) 2px;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  color: #fff;
+  font-weight: 400;
+  width: 20%;
+}
+
+ul {
+  color: #252525f1;
+  font-size: 1.5em;
+}
+h1,
+h2 {
+  color: rgb(0, 0, 0);
+  background-color: rgba(218, 218, 218, 0.5);
+  font-size: 2em;
+}
+
+img {
+  width: 20vw;
+  height: auto;
+}
+p {
+  color: #fff;
+  font-weight: 3em;
+}
+span {
+  color: #fff;
+  font-weight: 4em;
+}
+a {
+  color: white;
+  text-decoration: none;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+}

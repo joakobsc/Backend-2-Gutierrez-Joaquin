@@ -1,0 +1,47 @@
+<h1 id="welcome-message"></h1>
+
+<h2>Lista de Productos</h2>
+
+<p>CART ID: {{cartId}}</p>
+<!-- Esto se mostrará en la página -->
+
+
+<!-- Botón para ir al carrito -->
+<div>
+  <button onclick="window.location.href='/carts/{{cartId}}'">Ver Carrito</button>
+</div>
+
+<div class="products">
+  {{#each products}}
+    <div class="product">
+      <h2>{{this.title}}</h2>
+      <img src="{{this.thumbnail}}" alt="{{this.title}}">
+      <p>Descripción: 
+      <p>{{this.description}}</p>
+      <p>Precio: ${{this.price}}</p>
+      <p>Categoría: {{this.category}}</p>
+
+      <!-- Botón de agregar al carrito usando WebSocket -->
+      <button class="add-to-cart" data-product-id="{{this._id}}" data-cart-id="{{../cartId}}">
+        Agregar al carrito
+      </button>
+    </div>
+  {{/each}}
+</div>
+
+<!-- Paginación -->
+<div class="pagination">
+  {{#if (gt currentPage 1)}}
+    <a href="/products?page={{subtract currentPage 1}}">Anterior</a>
+  {{/if}}
+  <span>Página {{currentPage}} de {{totalPages}}</span>
+  {{#if (lt currentPage totalPages)}}
+    <a href="/products?page={{add currentPage 1}}">Siguiente</a>
+  {{/if}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{! 1er: socket }}
+<script src="/socket.io/socket.io.js"></script>
+{{! 2do: script .js de la carpeta public/cliente }}
+<script src="/js/home.js"></script>
