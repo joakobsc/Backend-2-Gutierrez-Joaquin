@@ -1,47 +1,57 @@
-<h1 id="welcome-message"></h1>
+<!-- src/views/home.handlebars -->
+<nav style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+  <a href="/products">Productos</a>
+  <a id="navCart" href="#" style="display:none">Mi carrito</a>
+  <a href="/register">Registrarme</a>
+  <button id="btnLogout" style="display:none">Salir</button>
+</nav>
 
-<h2>Lista de Productos</h2>
+<section
+  style="display:grid;grid-template-columns:1fr;gap:16px;max-width:720px"
+>
+  <!-- Bloque: usuario logueado (lo muestra home.js si hay sesión) -->
+  <div
+    id="boxLogged"
+    style="display:none;border:1px solid #ffffff;padding:12px;border-radius:8px"
+  >
+    <h2 style="margin:0 0 8px 0">¡Hola,
+      <span id="uName" style="color:rgb(0, 0, 0)"></span>!</h2>
+    <p><strong>Email:</strong> <span id="uEmail"></span></p>
+    <p><strong>Rol:</strong> <span id="uRole"></span></p>
+    <p id="uCartWrap" style="display:none"><strong>Cart ID:</strong>
+      <span id="uCart"></span></p>
+    <p style="margin-top:12px">
+      <a class="btn" href="/products">Ver productos</a>
+      <a
+        id="btnGoCart"
+        class="btn"
+        href="#"
+        style="display:none;margin-left:8px"
+      >Ir al carrito</a>
+    </p>
+  </div>
 
-<p>CART ID: {{cartId}}</p>
-<!-- Esto se mostrará en la página -->
+  <!-- Bloque: login (visible por defecto) -->
+  <div
+    id="boxLogin"
+    style="border:1px solid #eee;padding:12px;border-radius:8px"
+  >
+    <h2 style="margin:0 0 8px 0">Iniciar sesión</h2>
+    <form id="loginForm">
+      <input type="email" name="email" placeholder="Email" required />
+      <input
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+      />
+      <button type="submit">Entrar</button>
+      <div id="loginMsg" style="margin-top:8px;color:#c00"></div>
+    </form>
+    <p style="margin-top:12px">¿No tenés cuenta?
+      <a href="/register">Registrarme</a></p>
+  </div>
+</section>
 
-
-<!-- Botón para ir al carrito -->
-<div>
-  <button onclick="window.location.href='/carts/{{cartId}}'">Ver Carrito</button>
-</div>
-
-<div class="products">
-  {{#each products}}
-    <div class="product">
-      <h2>{{this.title}}</h2>
-      <img src="{{this.thumbnail}}" alt="{{this.title}}">
-      <p>Descripción: 
-      <p>{{this.description}}</p>
-      <p>Precio: ${{this.price}}</p>
-      <p>Categoría: {{this.category}}</p>
-
-      <!-- Botón de agregar al carrito usando WebSocket -->
-      <button class="add-to-cart" data-product-id="{{this._id}}" data-cart-id="{{../cartId}}">
-        Agregar al carrito
-      </button>
-    </div>
-  {{/each}}
-</div>
-
-<!-- Paginación -->
-<div class="pagination">
-  {{#if (gt currentPage 1)}}
-    <a href="/products?page={{subtract currentPage 1}}">Anterior</a>
-  {{/if}}
-  <span>Página {{currentPage}} de {{totalPages}}</span>
-  {{#if (lt currentPage totalPages)}}
-    <a href="/products?page={{add currentPage 1}}">Siguiente</a>
-  {{/if}}
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{! 1er: socket }}
-<script src="/socket.io/socket.io.js"></script>
-{{! 2do: script .js de la carpeta public/cliente }}
+<!-- Sólo lo necesario para este flujo -->
 <script src="/js/home.js"></script>

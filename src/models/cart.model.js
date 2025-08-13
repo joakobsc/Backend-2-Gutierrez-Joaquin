@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const cartCollection = "carts";
 
 const cartSchema = new mongoose.Schema({
-  // Productos que contiene el carrito
+  // Productos
   products: [
     {
       productId: {
@@ -10,7 +10,7 @@ const cartSchema = new mongoose.Schema({
         ref: "products", // Referencia al producto
         required: true,
       },
-      // Cantidad de cada producto en el carrito
+      // Cantidad
       quantity: {
         type: Number,
         required: true,
@@ -19,6 +19,12 @@ const cartSchema = new mongoose.Schema({
       _id: false,
     },
   ],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", //referencia al usuario
+    required: true,
+    unique: true,
+  },
 });
 
 export const cartModel = new mongoose.model(cartCollection, cartSchema);

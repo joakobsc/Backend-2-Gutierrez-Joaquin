@@ -1,17 +1,17 @@
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = "JWTsecreta"; // en producción siempre desde env
+const JWT_SECRET = "JWTsecreta"; // solo para pruebas
 
 export const generateToken = (user) => {
+  const id = user._id?.toString?.() || user.id;
+  if (!id) {
+    throw new Error("generateToken: falta el id del usuario");
+  }
+
   const payload = {
-    id: user._id,
+    id,
     email: user.email,
     role: user.role || "user",
   };
 
-  const options = {
-    expiresIn: "1d", // token válido 1 día
-  };
-
-  return jwt.sign(payload, JWT_SECRET, options);
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 };

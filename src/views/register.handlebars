@@ -1,0 +1,26 @@
+<!-- src/views/register.handlebars -->
+<nav style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+  <a href="/">Home</a>
+  <a href="/products">Productos</a>
+  <a id="navCart" href="#" style="display:none">Mi carrito</a>
+  <a href="/register">Registrarme</a>
+  <button id="btnLogout" style="display:none">Salir</button>
+</nav>
+
+<h1>Registro</h1>
+
+<form
+  id="registerForm"
+  style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"
+>
+  <input type="text" name="first_name" placeholder="Nombre" required />
+  <input type="text" name="last_name" placeholder="Apellido" required />
+  <input type="email" name="email" placeholder="Correo electrónico" required />
+  <input type="password" name="password" placeholder="Contraseña" required />
+  <input type="number" name="age" placeholder="Edad" min="0" />
+  <button type="submit">Registrarme</button>
+  <span id="regMsg" style="margin-left:8px;color:#c00;"></span>
+</form>
+
+<script src="/js/nav.js"></script>
+<script src="/js/register.js"></script>

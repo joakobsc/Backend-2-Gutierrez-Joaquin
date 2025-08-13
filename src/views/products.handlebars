@@ -1,0 +1,75 @@
+<nav style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+  <a href="/">Home</a>
+  <a href="/products">Productos</a>
+  <a id="navCart" href="#" style="display:none">Mi carrito</a>
+  <a href="/register">Registrarme</a>
+  <button id="btnLogout" style="display:none">Salir</button>
+</nav>
+
+<h2>Lista de Productos</h2>
+
+<!-- Bloque de estado invitado (login + registro) -->
+<section id="guestBlock">
+  <h3>Iniciar sesión</h3>
+  <form id="loginForm">
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Contraseña" required />
+    <button type="submit">Login</button>
+    <span id="loginMsg" style="margin-left:8px;color:#c00;"></span>
+  </form>
+  <div style="margin-top:8px">
+    <button onclick="window.location.href='/register'">Registrarme</button>
+  </div>
+</section>
+
+<!-- Bloque estado logueado (se muestra sólo si hay sesión) -->
+<section id="loggedBlock" style="display:none">
+  <p><strong>Cart ID:</strong> <span id="cartId"></span></p>
+  <button id="btnGoCart">Ver Carrito</button>
+</section>
+
+<hr style="margin:16px 0" />
+
+<div class="products">
+  {{#each products}}
+    <div
+      class="product"
+      style="margin-bottom:16px;border:1px solid #0000002c;padding:12px;border-radius:8px;background:#000000c5"
+    >
+      <h2>{{this.title}}</h2>
+      {{#if this.thumbnail}}<img
+          src="{{this.thumbnail}}"
+          alt="{{this.title}}"
+          style="max-width:320px;display:block;margin-bottom:8px"
+        />{{/if}}
+      <p>{{this.description}}</p>
+      <p><strong>Precio:</strong> ${{this.price}}</p>
+      <p><strong>Categoría:</strong> {{this.category}}</p>
+
+      <!-- Botón agregar: arranca deshabilitado, se habilita si hay sesión -->
+      <button
+        class="add-to-cart"
+        data-pid="{{this._id}}"
+        disabled
+        title="Inicia sesión para agregar al carrito"
+      >
+        Agregar al carrito
+      </button>
+    </div>
+  {{/each}}
+</div>
+
+<!-- Paginación -->
+<div class="pagination" style="margin-top:12px">
+  {{#if (gt currentPage 1)}}
+    <a href="/products?page={{subtract currentPage 1}}">← Anterior</a>
+  {{/if}}
+  <span style="margin:0 8px">Página {{currentPage}} de {{totalPages}}</span>
+  {{#if (lt currentPage totalPages)}}
+    <a href="/products?page={{add currentPage 1}}">Siguiente →</a>
+  {{/if}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/products.js"></script>

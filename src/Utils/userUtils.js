@@ -1,6 +1,7 @@
 import { UserModel } from "../models/users.model.js";
-import { hashPassword } from "./passwordUtils.js";
+import { hashPassword, comparePassword } from "./passwordUtils.js";
 
+// Crear usuario con contraseña hasheada
 export const createUser = async ({
   first_name,
   last_name,
@@ -19,4 +20,9 @@ export const createUser = async ({
   });
 
   return newUser.save();
+};
+
+// Validar contraseña
+export const isValidPassword = async (user, password) => {
+  return comparePassword(password, user.password);
 };

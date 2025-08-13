@@ -1,16 +1,36 @@
+<!-- src/views/cart.handlebars -->
+<nav style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+  <a href="/">Home</a>
+  <a href="/products">Productos</a>
+  <a id="navCart" href="#" style="display:none">Mi carrito</a>
+  <a href="/register">Registrarme</a>
+  <button id="btnLogout" style="display:none">Salir</button>
+</nav>
+
 <h1>Carrito de Compras</h1>
+
 {{#if cart.products.length}}
-  <ul>
+  <ul style="list-style:solid ;padding:0; color:white">
     {{#each cart.products}}
-      <li>
-        <h3>{{this.productId.title}}</h3>
-        <img src="{{this.productId.thumbnail}}" alt="{{this.productId.title}}" />
-        <p>Precio Unitario: ${{this.productId.price}}</
+      <li
+        style="margin-bottom:16px;border:1px solid #ffffff;padding:12px;border-radius:8px;background:#000000c5"
+      >
+        <h3 style="margin:0 0 8px 0">{{this.productId.title}}</h3>
+        {{#if this.productId.thumbnail}}
+          <img
+            src="{{this.productId.thumbnail}}"
+            alt="{{this.productId.title}}"
+            style="max-width:220px;display:block;margin-bottom:8px"
+          />
+        {{/if}}
+        <p>Precio unitario: ${{this.productId.price}}</p>
         <p>Cantidad: {{this.quantity}}</p>
-        <p>Precio: ${{this.productId.price}}</p>
       </li>
     {{/each}}
   </ul>
 {{else}}
   <p>El carrito está vacío.</p>
 {{/if}}
+
+<!-- Navbar logic (muestra/oculta "Mi carrito" y "Salir") -->
+<script src="/js/nav.js"></script>

@@ -1,101 +1,105 @@
-// Inicializar el socket en el cliente
-const socket = io();
-let user;
+const API = (url, { method = "GET", body } = {}) =>
+  fetch(url, {
+    method,
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  }).then(async (r) => {
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || data.message || "Error");
+    return data;
+  });
 
-// Verificar si ya existe un nombre de usuario en la sesión
-fetch("/get-session-user", { method: "GET" })
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Error al obtener el usuario desde la sesión");
-    }
-    return response.json();
-  })
-  .then((data) => {
-    if (data.user) {
-      user = data.user; // Si el usuario ya está en la sesión, lo usamos
-      // Mostrar mensaje de bienvenida en el DOM
-      const welcomeMessage = document.getElementById("welcome-message");
-      welcomeMessage.innerHTML = `<h2>¡Bienvenido, ${user}!</h2>`;
+const $id = (id) => document.getElementById(id);
+const show = (el, on = true) => el && (el.style.display = on ? "" : "none");
+const text = (el, v = "") => el && (el.textContent = v);
+const html = (el, v = "") => el && (el.innerHTML = v);
+const href = (el, v) => el && (el.href = v);
+
+async function refreshUI() {
+  const navCart = $id("navCart");
+  const btnLogout = $id("btnLogout");
+  const boxLogin = $id("boxLogin");
+  const boxLogged = $id("boxLogged");
+  const loginMsg = $id("loginMsg");
+  const uName = $id("uName");
+  const uEmail = $id("uEmail");
+  const uRole = $id("uRole");
+  const uCart = $id("uCart");
+  const uCartWrap = $id("uCartWrap");
+  const btnGoCart = $id("btnGoCart");
+  const welcome = $id("welcome-message");
+  const linkRegister = document.querySelector('a[href="/register"]');
+
+  try {
+    const { payload: user } = await API("/api/sessions/current");
+
+    // Estado logueado
+    show(boxLogin, false);
+    show(boxLogged, true);
+    show(btnLogout, true);
+    if (linkRegister) show(linkRegister, false);
+    if (loginMsg) text(loginMsg, "");
+
+    text(uName, user.first_name || "");
+    text(uEmail, user.email || "");
+    text(uRole, user.role || "user");
+    if (welcome)
+      html(welcome, `<h2>¡Bienvenido, ${user.first_name || user.email}!</h2>`);
+
+    const cid = String(user.cart || user.cartId || "");
+    const hasCart = Boolean(cid);
+
+    if (hasCart) {
+      text(uCart, cid);
+      show(uCartWrap, true);
+      if (navCart) {
+        show(navCart, true);
+        href(navCart, `/cart/${cid}`);
+      }
+      if (btnGoCart) {
+        show(btnGoCart, true);
+        href(btnGoCart, `/cart/${cid}`);
+      }
     } else {
-      // Solicitar el nombre de usuario al cargar la página
-      Swal.fire({
-        icon: "info",
-        title: "Bienvenido!",
-        text: "Ingrese su nombre para identificarse.",
-        input: "text",
-        inputPlaceholder: "Nombre de usuario",
-        allowOutsideClick: false,
-        inputValidator: (value) => {
-          if (!value) {
-            return "Por favor, ingrese un nombre de usuario.";
-          } else {
-            user = value; // Guardar el nombre del usuario
-            socket.emit("userConnected", { user }); // Emitir evento al servidor
-
-            // Guardar el nombre de usuario en la sesión
-            fetch("/set-session-user", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ user }),
-            }).then((response) => {
-              if (!response.ok) {
-                throw new Error("Error al guardar el usuario en la sesión");
-              }
-            });
-
-            return null;
-          }
-        },
-      }).then(() => {
-        // Mostrar mensaje de bienvenida en el DOM
-        const welcomeMessage = document.getElementById("welcome-message");
-        welcomeMessage.innerHTML = `<h2>¡Bienvenido, ${user}!</h2>`;
-      });
+      show(uCartWrap, false);
+      show(navCart, false);
+      show(btnGoCart, false);
     }
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });
+  } catch {
+    // Invitado
+    show(boxLogged, false);
+    show(boxLogin, true);
+    show(btnLogout, false);
+    show(navCart, false);
+    if (welcome) text(welcome, "");
+    if (linkRegister) show(linkRegister, true);
+  }
+}
 
-// Capturar el evento de clic en el botón "Agregar al carrito"
-document.addEventListener("DOMContentLoaded", () => {
-  const addToCartButtons = document.querySelectorAll(".add-to-cart");
-
-  addToCartButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const productId = e.target.getAttribute("data-product-id");
-      const cartId = e.target.getAttribute("data-cart-id");
-
-      // Emitimos el evento 'addToCart' al servidor con el ID del producto y del carrito
-      socket.emit("addToCart", { productId, cartId });
-
-      // Mostrar el mensaje de éxito
-      Swal.fire({
-        icon: "success",
-        title: "Producto agregado",
-        text: "El producto fue agregado al carrito exitosamente",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    });
-  });
+// Login
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const loginMsg = $id("loginMsg");
+  if (loginMsg) text(loginMsg, "");
+  const body = Object.fromEntries(new FormData(e.currentTarget).entries());
+  try {
+    await API("/api/sessions/login", { method: "POST", body });
+    await refreshUI();
+    if (window.__refreshNav) window.__refreshNav(); // refresca navbar global si existe
+  } catch (error) {
+    if (loginMsg) text(loginMsg, error.message);
+  }
 });
 
-// Escuchar mensajes de éxito o error desde el servidor
-socket.on("cartUpdated", (data) => {
-  Swal.fire({
-    icon: "success",
-    title: "Producto agregado",
-    text: data.message,
-    timer: 1500,
-    showConfirmButton: false,
-  });
+// Logout (POST)
+$id("btnLogout")?.addEventListener("click", async () => {
+  try {
+    await API("/api/sessions/logout", { method: "POST" });
+  } catch {}
+  await refreshUI();
+  if (window.__refreshNav) window.__refreshNav();
 });
 
-socket.on("error", (data) => {
-  Swal.fire({
-    icon: "error",
-    title: "Error",
-    text: data.message,
-  });
-});
+// Estado inicial
+refreshUI();
