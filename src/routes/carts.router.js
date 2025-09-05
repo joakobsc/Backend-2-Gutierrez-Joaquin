@@ -5,10 +5,10 @@ import { requireOwner } from "../middlewares/requireCartOwner.js";
 
 const router = Router();
 
-//  Leer carrito → dueño
+//  Leer carrito  dueño
 router.get("/:cid", requireJWT, requireOwner, CartsController.getCart);
 
-//  Agregar producto → dueño
+//  Agregar producto  dueño
 router.post(
   "/:cid/product/:pid",
   requireJWT,
@@ -16,7 +16,7 @@ router.post(
   CartsController.addProduct
 );
 
-//  Eliminar producto → dueño
+//  Eliminar producto  dueño
 router.delete(
   "/:cid/product/:pid",
   requireJWT,
@@ -24,13 +24,13 @@ router.delete(
   CartsController.removeProduct
 );
 
-//  Reemplazar todos los productos → dueño
+//  Reemplazar todos los productos  dueño
 router.put("/:cid", requireJWT, requireOwner, CartsController.setProducts);
 
-//  Vaciar carrito → dueño
+//  Vaciar carrito  dueño
 router.delete("/:cid", requireJWT, requireOwner, CartsController.clear);
 
-//  Comprar carrito → dueño (genera ticket)
+//  Comprar carrito  dueño (genera ticket)
 router.post(
   "/:cid/purchase",
   requireJWT,
@@ -38,7 +38,7 @@ router.post(
   CartsController.purchase
 );
 
-//  Traer todos los carritos → admin (opcional)
+//  Traer todos los carritos  admin
 router.get("/", requireJWT, auth(["admin"]), CartsController.getAllCarts);
 
 export default router;

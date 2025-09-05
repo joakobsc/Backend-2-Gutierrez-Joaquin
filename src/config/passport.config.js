@@ -4,16 +4,17 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { createUser } from "../utils/userUtils.js";
 import { UserModel } from "../models/users.model.js";
 import { comparePassword } from "../utils/passwordUtils.js";
-import { JWT_SECRET, COOKIE_NAME } from "./env.js"; // 🔹 import de env.js
+import { JWT_SECRET, COOKIE_NAME } from "./env.js";
 
 const LocalStrategy = local.Strategy;
 
-// REGISTER
+// REGISTER (Local)
 passport.use(
   "register",
   new LocalStrategy(
     {
       usernameField: "email",
+      passwordField: "password",
       passReqToCallback: true,
     },
     async (req, email, password, done) => {
@@ -49,24 +50,20 @@ passport.use(
   )
 );
 
-// LOGIN
+// LOGIN (Local)
 passport.use(
   "login",
   new LocalStrategy(
-    {
-      usernameField: "email",
-    },
+    { usernameField: "email", passwordField: "password" },
     async (email, password, done) => {
       try {
         const user = await UserModel.findOne({ email });
-        if (!user) {
+        if (!user)
           return done(null, false, { message: "Usuario no encontrado" });
-        }
 
         const validPassword = await comparePassword(password, user.password);
-        if (!validPassword) {
+        if (!validPassword)
           return done(null, false, { message: "Contraseña incorrecta" });
-        }
 
         return done(null, user);
       } catch (error) {
@@ -76,28 +73,22 @@ passport.use(
   )
 );
 
-// CURRENT con JWT
+// CURRENT (JWT por cookie)
 passport.use(
   "current",
   new JwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => {
-          let token = null;
-          if (req && req.cookies) {
-            token = req.cookies[COOKIE_NAME]; // 🔹 ahora viene de env
-          }
-          return token;
-        },
+        (req) => (req?.cookies ? req.cookies[COOKIE_NAME] : null),
       ]),
-      secretOrKey: JWT_SECRET, // 🔹 ahora viene de env
+      secretOrKey: JWT_SECRET,
     },
     async (jwtPayload, done) => {
       try {
-        const user = await UserModel.findById(jwtPayload.id);
-        if (!user) {
-          return done(null, false);
-        }
+        // 👇 tu token firma _id, no id
+        const userId = jwtPayload._id || jwtPayload.id;
+        const user = await UserModel.findById(userId);
+        if (!user) return done(null, false);
         return done(null, user);
       } catch (error) {
         return done(error, false);

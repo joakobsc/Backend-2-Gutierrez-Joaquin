@@ -17,6 +17,7 @@ export const createUser = async ({
     email,
     age,
     password: hashedPassword,
+    role: "user",
   });
 
   return newUser.save();

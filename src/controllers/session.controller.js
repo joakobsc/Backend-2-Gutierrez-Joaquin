@@ -1,7 +1,7 @@
 import { cartModel } from "../models/cart.model.js";
 import { UserModel } from "../models/users.model.js";
 import { generateToken } from "../utils/generateJWT.js";
-import { COOKIE_NAME } from "../config/env.js"; // ✅ desde env.js
+import { COOKIE_NAME } from "../config/env.js";
 import { UserDTO } from "../dto/user.dto.js";
 
 const COOKIE_MAX_AGE = 60 * 60 * 1000; // 1 hora
@@ -9,8 +9,8 @@ const COOKIE_MAX_AGE = 60 * 60 * 1000; // 1 hora
 const cookieOptions = {
   httpOnly: true,
   maxAge: COOKIE_MAX_AGE,
-  sameSite: "lax", // ⚠️ si frontend y backend están en dominios distintos, usar "none"
-  secure: process.env.NODE_ENV === "production", // ⚠️ con SameSite:"none" debe ser true
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
 };
 
 const sanitizeUser = (user) => ({
@@ -56,12 +56,12 @@ export const login = async (req, res) => {
       req.user.cartId = cartId;
     }
 
-    // Firmar JWT (incluimos cartId por conveniencia futura)
+    // Firmar JWT
     const token = generateToken({
       _id: req.user._id,
       email: req.user.email,
       role: req.user.role || "user",
-      cartId, // ✅ útil si luego querés leerlo en middlewares
+      cartId,
     });
 
     res.cookie(COOKIE_NAME, token, cookieOptions);
@@ -82,7 +82,6 @@ export const login = async (req, res) => {
 
 // logout
 export const logout = (req, res) => {
-  // Nota: clearCookie debe usar mismas flags que el set-cookie
   res.clearCookie(COOKIE_NAME, { ...cookieOptions });
   return res.status(200).json({ status: "success", message: "Sesión cerrada" });
 };

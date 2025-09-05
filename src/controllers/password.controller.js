@@ -10,7 +10,7 @@ export class PasswordController {
       const result = await PasswordService.request(email);
       if (result) await sendPasswordResetMail(email, result.token);
 
-      return res.status(200).json({ ok: true }); // siempre 200
+      return res.status(200).json({ ok: true });
     } catch (error) {
       return res.status(500).json({ error: error.message || "error interno" });
     }
