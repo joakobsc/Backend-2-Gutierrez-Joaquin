@@ -1,8 +1,9 @@
+// src/routes/views.router.js
 import { Router } from "express";
-import passport from "../config/passport.config.js";
 import { productsModel } from "../models/product.model.js";
 import { cartModel } from "../models/cart.model.js";
-import { requireOwnerOrAdmin } from "../middlewares/requireCartOwner.js";
+import { requireJWT } from "../middlewares/auth.js";
+import { requireOwner } from "../middlewares/requireCartOwner.js";
 
 const router = Router();
 
@@ -33,11 +34,11 @@ router.get("/products", async (req, res) => {
   }
 });
 
-/* Carrito: solo dueño o admin (renderiza con populate para la vista) */
+/* Carrito: solo dueño (owner-only) */
 router.get(
   "/cart/:cid",
-  passport.authenticate("current", { session: false }),
-  requireOwnerOrAdmin,
+  requireJWT, // valida JWT y popula req.user
+  requireOwner, // verifica que :cid sea el cartId del usuario
   async (req, res) => {
     try {
       const { cid } = req.params;
@@ -46,13 +47,11 @@ router.get(
         .populate("products.productId")
         .lean();
 
-      if (!cart)
+      if (!cart) {
         return res.status(404).json({ message: "Carrito no encontrado" });
+      }
 
-      return res.render("cart", {
-        cart,
-        style: "index.css",
-      });
+      return res.render("cart", { cart, style: "index.css" });
     } catch (error) {
       console.log("Error al obtener el carrito:", error);
       res.status(500).json({ error: "Error al obtener el carrito" });

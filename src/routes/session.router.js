@@ -1,34 +1,31 @@
-// src/routes/session.router.js
 import { Router } from "express";
 import passport from "../config/passport.config.js";
 import sessionController from "../controllers/session.controller.js";
+import { requireJWT } from "../middlewares/auth.js"; // ✅ unificamos
 
 const router = Router();
 
-// REGISTER → si falla, responde JSON con error
+// REGISTER
 router.post(
   "/register",
   passport.authenticate("register", { session: false, failWithError: true }),
   sessionController.register
 );
 
-// LOGIN → si falla, responde JSON con error
+// LOGIN
 router.post(
   "/login",
   passport.authenticate("login", { session: false, failWithError: true }),
   sessionController.login
 );
 
-// LOGOUT (dejamos GET como tenías)
+// LOGOUT
 router.post("/logout", sessionController.logout);
 
-// CURRENT (JWT por cookie) → si falla, 401 JSON
-router.get(
-  "/current",
-  passport.authenticate("current", { session: false, failWithError: true }),
-  sessionController.current
-);
+// CURRENT (JWT por cookie) — ✅ usamos requireJWT para mantener consistencia
+router.get("/current", requireJWT, sessionController.current);
 
+// Manejo de errores central de passport.* (register/login)
 router.use((error, req, res, _next) => {
   const status = error.status || 401;
   const msg =

@@ -4,9 +4,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { createUser } from "../utils/userUtils.js";
 import { UserModel } from "../models/users.model.js";
 import { comparePassword } from "../utils/passwordUtils.js";
-
-const JWT_SECRET = "JWTsecreta";
-const COOKIE_NAME = "tokenCookie";
+import { JWT_SECRET, COOKIE_NAME } from "./env.js"; // 🔹 import de env.js
 
 const LocalStrategy = local.Strategy;
 
@@ -87,12 +85,12 @@ passport.use(
         (req) => {
           let token = null;
           if (req && req.cookies) {
-            token = req.cookies[COOKIE_NAME];
+            token = req.cookies[COOKIE_NAME]; // 🔹 ahora viene de env
           }
           return token;
         },
       ]),
-      secretOrKey: JWT_SECRET,
+      secretOrKey: JWT_SECRET, // 🔹 ahora viene de env
     },
     async (jwtPayload, done) => {
       try {

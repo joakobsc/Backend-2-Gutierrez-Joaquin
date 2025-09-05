@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-const JWT_SECRET = "JWTsecreta"; // solo para pruebas
+import { JWT_SECRET } from "../config/env.js";
 
 export const generateToken = (user) => {
   const id = user._id?.toString?.() || user.id;

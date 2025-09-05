@@ -1,16 +1,18 @@
-// middleware
-import passport from "../config/passport.config.js";
+// Dueño del carrito
+export const requireOwner = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "No autenticado" });
+  }
 
-export const requireJWT = passport.authenticate("current", { session: false });
+  const cid = String(req.params.cid || "");
+  if (!cid) {
+    return res.status(400).json({ error: "Falta parámetro cid" });
+  }
 
-export const requireAdmin = (req, res, next) => {
-  if (req.user?.role === "admin") return next();
-  return res.status(403).json({ error: "No autorizado (solo admin)" });
-};
+  const userCartId = String(req.user?.cartId || "");
+  if (userCartId && userCartId === cid) return next();
 
-export const requireOwnerOrAdmin = (req, res, next) => {
-  const isAdmin = req.user?.role === "admin";
-  const owns = String(req.user?.cartId) === String(req.params.cid);
-  if (isAdmin || owns) return next();
-  return res.status(403).json({ error: "No autorizado" });
+  return res
+    .status(403)
+    .json({ error: "Solo el dueño del carrito puede realizar esta acción" });
 };

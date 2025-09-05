@@ -1,15 +1,16 @@
 import { cartModel } from "../models/cart.model.js";
 import { UserModel } from "../models/users.model.js";
 import { generateToken } from "../utils/generateJWT.js";
+import { COOKIE_NAME } from "../config/env.js"; // ✅ desde env.js
+import { UserDTO } from "../dto/user.dto.js";
 
-const COOKIE_NAME = "tokenCookie";
 const COOKIE_MAX_AGE = 60 * 60 * 1000; // 1 hora
 
 const cookieOptions = {
   httpOnly: true,
   maxAge: COOKIE_MAX_AGE,
-  sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax", // ⚠️ si frontend y backend están en dominios distintos, usar "none"
+  secure: process.env.NODE_ENV === "production", // ⚠️ con SameSite:"none" debe ser true
 };
 
 const sanitizeUser = (user) => ({
@@ -34,7 +35,7 @@ export const register = (req, res) => {
     .json({ status: "success", payload: sanitizeUser(req.user) });
 };
 
-// passport "login" generamos JWT y cookie
+// passport "login" → generamos JWT y cookie
 export const login = async (req, res) => {
   try {
     if (!req.user) {
@@ -45,23 +46,22 @@ export const login = async (req, res) => {
 
     // Asegurar carrito
     let cartId = req.user.cartId?.toString?.() || null;
-
     if (!cartId) {
       const newCart = await cartModel.create({
         products: [],
         user: req.user._id,
-      }); // tu cart.schema no tiene 'user'
+      });
       cartId = newCart._id.toString();
-
       await UserModel.findByIdAndUpdate(req.user._id, { cartId });
-      req.user.cartId = cartId; // mantener sincronizado
+      req.user.cartId = cartId;
     }
 
-    // Firmar JWT
+    // Firmar JWT (incluimos cartId por conveniencia futura)
     const token = generateToken({
       _id: req.user._id,
       email: req.user.email,
       role: req.user.role || "user",
+      cartId, // ✅ útil si luego querés leerlo en middlewares
     });
 
     res.cookie(COOKIE_NAME, token, cookieOptions);
@@ -69,9 +69,7 @@ export const login = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Login exitoso",
-      payload: {
-        ...sanitizeUser(req.user),
-      },
+      payload: sanitizeUser(req.user),
       expiresAt: Date.now() + COOKIE_MAX_AGE,
     });
   } catch (error) {
@@ -84,18 +82,19 @@ export const login = async (req, res) => {
 
 // logout
 export const logout = (req, res) => {
+  // Nota: clearCookie debe usar mismas flags que el set-cookie
   res.clearCookie(COOKIE_NAME, { ...cookieOptions });
   return res.status(200).json({ status: "success", message: "Sesión cerrada" });
 };
 
-// current - protegido con passport "current" (JWT por cookie)
+// current - protegido con requireJWT (estrategia "current")
 export const current = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ status: "error", message: "No autenticado" });
   }
   return res
     .status(200)
-    .json({ status: "success", payload: sanitizeUser(req.user) });
+    .json({ status: "success", payload: UserDTO.fromUser(req.user) });
 };
 
 export default { register, login, logout, current };

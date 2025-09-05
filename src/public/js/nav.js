@@ -16,7 +16,7 @@
 
       // mostrar / ocultar según sesión
       if (btnLogout) btnLogout.style.display = "";
-      if (linkRegister) linkRegister.style.display = "none"; // ⟵ ocultar "Registrarme" logueado
+      if (linkRegister) linkRegister.style.display = "none"; // ocultar "Registrarme" logueado
 
       if (navCart && cid) {
         navCart.style.display = "";
@@ -29,7 +29,7 @@
       if (btnLogout) btnLogout.style.display = "none";
       if (navCart) navCart.style.display = "none";
       const linkRegister = document.querySelector('a[href="/register"]');
-      if (linkRegister) linkRegister.style.display = ""; // ⟵ mostrar "Registrarme" invitado
+      if (linkRegister) linkRegister.style.display = ""; //  mostrar "Registrarme" invitado
     }
   }
 
