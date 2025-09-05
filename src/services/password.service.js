@@ -11,12 +11,12 @@ export class PasswordService {
     })
       .select("+password")
       .lean();
-    if (!user) return; // no revelar si existe o no
+    if (!user) return;
 
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-    await PasswordResetModel.deleteMany({ userId: user._id }); // invalida anteriores
+    await PasswordResetModel.deleteMany({ userId: user._id });
     await PasswordResetModel.create({ userId: user._id, token, expiresAt });
 
     return { token, userEmail: user.email };

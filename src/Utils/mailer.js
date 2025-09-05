@@ -1,3 +1,4 @@
+// src/utils/mailer.js
 import nodemailer from "nodemailer";
 import {
   SMTP_HOST,
@@ -7,38 +8,50 @@ import {
   APP_BASE_URL,
 } from "../config/env.js";
 
-const port = Number(SMTP_PORT ?? 587);
-
+// configurar transporter (Gmail + App Password)
 export const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port,
-  secure: port === 465,
-  auth: { user: SMTP_USER, pass: SMTP_PASS },
+  host: SMTP_HOST || "smtp.gmail.com",
+  port: Number(SMTP_PORT) || 587,
+  secure: false,
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASS,
+  },
 });
 
-/**
- * Envía mail con link de reseteo (expira en 1h).
- * @param {string} to - email destino
- * @param {string} token - token único
- */
+// enviar email de reset con link y token
 export async function sendPasswordResetMail(to, token) {
-  const url = `${APP_BASE_URL}/password/reset?token=${encodeURIComponent(
-    token
+  const tokenStr = typeof token === "string" ? token : token?.token;
+  if (!tokenStr) {
+    throw new Error("No se recibió un token válido");
+  }
+
+  // generar link de reset
+  const resetUrl = `${APP_BASE_URL}/api/password/reset?token=${encodeURIComponent(
+    tokenStr
   )}`;
+
   const html = `
-    <p>Solicitaste restablecer tu contraseña.</p>
-    <p>Este enlace expira en 1 hora:</p>
-    <p>
-      <a href="${url}" style="background:#4f46e5;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;">
-        Restablecer contraseña
-      </a>
-    </p>
-    <p>Si no fuiste vos, ignorá este correo.</p>
+    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+    <p><a href="${resetUrl}" target="_blank" rel="noopener noreferrer">Restablecer contraseña</a></p>
   `;
-  await transporter.sendMail({
+
+  const info = await transporter.sendMail({
     from: `"Soporte" <${SMTP_USER}>`,
     to,
-    subject: "Restablecer contraseña",
+    subject: "Recuperar contraseña",
+    text: `Enlace: ${resetUrl}`,
     html,
   });
+
+  console.log("sendMail result:", {
+    messageId: info.messageId,
+    accepted: info.accepted,
+    rejected: info.rejected,
+    response: info.response,
+  });
+
+  console.log("Reset URL (útil para pruebas):", resetUrl);
+
+  return info;
 }
